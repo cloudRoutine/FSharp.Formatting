@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.CodeFormat.Tests</RootNamespace>
     <AssemblyName>FSharp.CodeFormat.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <Name>FSharp.CodeFormat.Tests</Name>

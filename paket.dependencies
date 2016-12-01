@@ -1,14 +1,15 @@
 source http://nuget.org/api/v2
 redirects: on
 
+github matthid/Yaaf.FSharp.Scripting src/source/Yaaf.FSharp.Scripting/YaafFSharpScripting.fs
+
 nuget FSharp.Data
-nuget FAKE
+
 nuget CommandLineParser
 nuget FSharp.Core
-nuget Microsoft.AspNet.Razor
-nuget RazorEngine
-nuget NUnit ~> 2
-nuget NUnit.Runners ~> 2
+nuget Microsoft.AspNet.Razor 4.0.0-rc1-final prerelease
+nuget RazorEngine 4.4.3-rc1 prerelease
+
 nuget NuGet.CommandLine
 nuget FSharp.Compiler.Service == 2.0.0.6
 // See http://fsprojects.github.io/Paket/nuget-dependencies.html
@@ -19,4 +20,13 @@ nuget FSharp.Compiler.Service == 2.0.0.6
 nuget FSharpVSPowerTools.Core !>= 0
 nuget ILRepack
 
-github matthid/Yaaf.FSharp.Scripting src/source/Yaaf.FSharp.Scripting/YaafFSharpScripting.fs
+group build 
+    source http://nuget.org/api/v2
+    
+    nuget FAKE
+
+group test
+    source http://nuget.org/api/v2
+
+    nuget NUnit 
+    nuget NUnit.Runners

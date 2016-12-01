@@ -2,8 +2,8 @@
 // FAKE build script
 // --------------------------------------------------------------------------------------
 
-#I @"packages/FAKE/tools"
-#r @"packages/FAKE/tools/FakeLib.dll"
+#I @"packages/build/FAKE/tools"
+#r @"packages/build/FAKE/tools/FakeLib.dll"
 
 open System
 open System.IO
@@ -42,6 +42,8 @@ let tags = "F# fsharp formatting markdown code fssnip literate programming"
 
 // Read release notes document
 let release = ReleaseNotesHelper.parseReleaseNotes (File.ReadLines "RELEASE_NOTES.md")
+
+let (^) = (<|)
 
 // --------------------------------------------------------------------------------------
 // Generate assembly info files with the right version & up-to-date information
@@ -133,7 +135,7 @@ Target "MergeVSPowerTools" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build tests and generate tasks to run the tests in sequence
 
-Target "BuildTests" (fun _ ->
+Target "BuildTests" ^ fun _ ->
     { BaseDirectory = __SOURCE_DIRECTORY__
       Includes = ["FSharp.Formatting.sln"]
       Excludes = [] }
@@ -163,28 +165,29 @@ Target "BuildTests" (fun _ ->
       Excludes = [] }
     |> MSBuildDebug "" "Rebuild"
     |> ignore
-)
+
+
+open Fake.Testing
 
 let testProjects =
   [ "FSharp.CodeFormat.Tests"; "FSharp.Literate.Tests";
     "FSharp.Markdown.Tests"; "FSharp.MetadataFormat.Tests" ]
 
-Target "RunTests" <| ignore
-
-// For each test project file, generate a new "RunTest_Xyz" which
-// runs the test (to process them sequentially which is needed in Travis)
-for name in testProjects do
-    let taskName = sprintf "RunTest_%s" name
-    Target taskName <| fun () ->
-        !! (sprintf "tests/*/bin/Release/%s.dll" name)
-        |> NUnit (fun p ->
-            { p with
-                DisableShadowCopy = true
-                TimeOut = TimeSpan.FromMinutes 20.
-                Framework = "4.0"
-                OutputFile = "TestResults.xml" })
-    taskName ==> "RunTests" |> ignore
-    "BuildTests" ==> taskName |> ignore
+Target "RunTests" ^ fun _ ->
+    // For each test project file, generate a new "RunTest_Xyz" which
+    // runs the test (to process them sequentially which is needed in Travis)
+    for name in testProjects do
+        let taskName = sprintf "RunTest_%s" name
+        Target taskName ^ fun () ->
+            !! (sprintf "tests/*/bin/Release/%s.dll" name)
+            |> NUnit3 ^ fun p ->
+                { p with
+                    ShadowCopy = false
+                    TimeOut = TimeSpan.FromMinutes 20.
+                    OutputDir = "TestResults.xml" 
+                }
+        taskName     ==> "RunTests" |> ignore
+        "BuildTests" ==>  taskName  |> ignore
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
