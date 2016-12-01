@@ -89,7 +89,9 @@ module private Helpers =
 // Main type that implements parsing and uses F# services
 // --------------------------------------------------------------------------------------
 
-open FSharpVSPowerTools
+open FSharp.Editing
+open FSharp.Editing.Features
+open FSharp.Editing.Infrastructure
 
 
 type Range = 
@@ -118,7 +120,7 @@ type CodeFormatAgent() =
     | _ -> None
 
   // Processes a single line of the snippet
-  let processSnippetLine (checkResults: ParseAndCheckResults) (spans: CategorizedColumnSpan<_> list) 
+  let processSnippetLine (checkResults: ParseAndCheckResults) (spans: CategorizedSpan list) 
                          (lines: string[]) (line: int, lineTokens: SnippetLine) =
     let lineStr = lines.[line]
 

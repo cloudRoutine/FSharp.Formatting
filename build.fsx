@@ -43,6 +43,9 @@ let tags = "F# fsharp formatting markdown code fssnip literate programming"
 // Read release notes document
 let release = ReleaseNotesHelper.parseReleaseNotes (File.ReadLines "RELEASE_NOTES.md")
 
+/// net46
+let framework = "net46"
+
 let (^) = (<|)
 
 // --------------------------------------------------------------------------------------
@@ -84,7 +87,7 @@ Target "Clean" (fun _ ->
 open System.IO
 
 Target "UpdateFsxVersions" (fun _ ->
-    let packages = [ "FSharp.Compiler.Service"; "FSharpVSPowerTools.Core" ]
+    let packages = [ "FSharp.Compiler.Service"; "FSharp.Editing.Core" ]
     let replacements =
       packages |> Seq.map (fun packageName ->
         sprintf "/%s.(.*)/lib" packageName,
@@ -211,7 +214,7 @@ let RequireRange breakingPoint version =
 
 Target "CopyFSharpCore" (fun _ ->
     // We need to include optdata and sigdata as well, we copy everything to be consistent
-    for file in System.IO.Directory.EnumerateFiles("packages" </> "FSharp.Core" </> "lib" </> "net40") do
+    for file in System.IO.Directory.EnumerateFiles("packages" </> "FSharp.Core" </> "lib" </> framework) do
         let source, dest = file, Path.Combine("bin", Path.GetFileName(file))
         printfn "Copying %s to %s" source dest
         File.Copy(source, dest, true))
@@ -231,8 +234,8 @@ Target "NuGet" (fun _ ->
             Publish = hasBuildParam "nugetkey"
             Dependencies =
                 [ // From experience they always break something at the moment :(
-                  "FSharpVSPowerTools.Core", GetPackageVersion "packages" "FSharpVSPowerTools.Core" |> RequireRange BreakingPoint.Minor
-                  "FSharp.Compiler.Service", "[2.0.0.6]" // GetPackageVersion "packages" "FSharp.Compiler.Service" |> RequireRange BreakingPoint.Minor
+                  //"FSharpVSPowerTools.Core", GetPackageVersion "packages" "FSharpVSPowerTools.Core" |> RequireRange BreakingPoint.Minor
+                  "FSharp.Compiler.Service", "[8.0.0]" // GetPackageVersion "packages" "FSharp.Compiler.Service" |> RequireRange BreakingPoint.Minor
                    ] })
         "nuget/FSharp.Formatting.nuspec"
 
@@ -367,15 +370,17 @@ let bootStrapDocumentationFiles () =
     // If you came here from the nuspec file add your file.
     // If you add files here to make the CI happy add those files to the .nuspec file as well
     // TODO: INSTEAD build the nuspec file before generating the documentation and extract it...
-    ensureDirectory (__SOURCE_DIRECTORY__ </> "packages/FSharp.Formatting/lib/net40")
+    ensureDirectory (__SOURCE_DIRECTORY__ </> "packages/FSharp.Formatting/lib"</>framework)
     let buildFiles = [ "CSharpFormat.dll"; "FSharp.CodeFormat.dll"; "FSharp.Literate.dll"
                        "FSharp.Markdown.dll"; "FSharp.MetadataFormat.dll"; "RazorEngine.dll";
-                       "System.Web.Razor.dll"; "FSharp.Formatting.Common.dll"; "FSharp.Formatting.Razor.dll" ]
+//                       "System.Web.Razor.dll"; 
+                       "Microsoft.AspNet.Razor.dll";
+                       "FSharp.Formatting.Common.dll"; "FSharp.Formatting.Razor.dll" ]
     let bundledFiles =
         buildFiles
         |> List.map (fun f ->
             __SOURCE_DIRECTORY__ </> sprintf "bin/%s" f,
-            __SOURCE_DIRECTORY__ </> sprintf "packages/FSharp.Formatting/lib/net40/%s" f)
+            __SOURCE_DIRECTORY__ </> sprintf "packages/FSharp.Formatting/lib/%s/%s" framework f)
         |> List.map (fun (source, dest) -> Path.GetFullPath source, Path.GetFullPath dest)
     for source, dest in bundledFiles do
         try

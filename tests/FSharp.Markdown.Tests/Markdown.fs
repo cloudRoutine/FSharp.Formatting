@@ -116,7 +116,7 @@ foo\$\$bar<>\$\&\%\$\#\_\{\}
 foo\$\$bar<>\$\&\%\$\#\_\{\}"""
   let expected = """<p><span class="math">\[foo\$\$bar&lt;&gt;\$\&amp;\%\$\#\_\{\}
 foo\$\$bar&lt;&gt;\$\&amp;\%\$\#\_\{\}\]</span></p>"""
-  (Markdown.TransformHtml doc).Trim()
+  (Markdown.TransformHtml(doc,"\n")).Trim()
   |> shouldEqual expected
 
 [<Test>]

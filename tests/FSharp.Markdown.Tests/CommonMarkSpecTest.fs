@@ -1,5 +1,6 @@
 ﻿module FSharp.Markdown.Tests.CommonMarkSpecTest
 
+open System
 open System.IO
 open System.Diagnostics
 let (++) a b = Path.Combine(a, b)
@@ -12,6 +13,10 @@ let sample = CommonMarkSpecJson.GetSamples()
 let sections =
   sample
   |> Seq.groupBy (fun s -> s.Section)
+
+let linuxLineEndings (text : string) = text.Replace("\r\n", "\n").Replace("\r", "\n")
+
+let linuxLines2 str1 str2 = linuxLineEndings str1, linuxLineEndings str2
 
 open FsUnit
 open NUnit.Framework
@@ -37,6 +42,7 @@ let getTests () =
 [<Test>]
 [<TestCaseSource("getTests")>]
 let ``Commonmark specification`` (section:string) (markdown : string) (html : string) =
+  let markdown, html = linuxLines2 markdown html
   printfn "Markdown: '%s'" markdown
   (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
@@ -46,14 +52,14 @@ let ``manual markdown test: show a blockquote with a code block`` () =
   let markdown = """Blockquotes can contain other Markdown elements, including headers, lists,
 and code blocks:
 
-	> ## This is a header.
-	> 
-	> 1.   This is the first list item.
-	> 2.   This is the second list item.
-	> 
-	> Here's some example code:
-	> 
-	>     return shell_exec("echo $input | $markdown_script");
+    > ## This is a header.
+    > 
+    > 1.   This is the first list item.
+    > 2.   This is the second list item.
+    > 
+    > Here's some example code:
+    > 
+    >     return shell_exec("echo $input | $markdown_script");
 
 Any decent text editor should make email-style quoting easy."""
   let html = """<p>Blockquotes can contain other Markdown elements, including headers, lists,
@@ -69,7 +75,8 @@ and code blocks:</p>
 </code></pre>
 <p>Any decent text editor should make email-style quoting easy.</p>
 """
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 
@@ -89,7 +96,8 @@ will turn into:"""
 </code></pre>
 <p>will turn into:</p>
 """
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
   
 [<Test>]
@@ -111,7 +119,8 @@ indented with spaces</p>
 </li>
 </ul>
 """
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -133,7 +142,8 @@ indented with spaces</p>
 </li>
 </ul>
 """
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -144,7 +154,8 @@ with a continuation line
   let html = "<p>this is a paragraph ending with two spaces\t<br />
 with a continuation line</p>
 "
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -155,7 +166,8 @@ with a continuation line
   let html = "<p>this is a paragraph ending with tab  \t
 with a continuation line</p>
 "
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -168,8 +180,9 @@ let ``manual markdown test: test code block (with tabs) in list`` () =
 </code></pre>
 </li>
 </ul>
-"
-  (Markdown.TransformHtml(markdown))
+"  
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -183,7 +196,8 @@ let ``manual markdown test: test code block (with spaces) in list`` () =
 </li>
 </ul>
 "
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -196,7 +210,8 @@ with continuation
 with continuation</p>
 </blockquote>
 "
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html
 
 [<Test>]
@@ -209,5 +224,6 @@ let ``manual markdown test: blockquote without continuation`` () =
 </blockquote>
 <h1>without continuation</h1>
 "
-  (Markdown.TransformHtml(markdown))
+  let markdown, html = linuxLines2 markdown html
+  (Markdown.TransformHtml(markdown, "\n"))
   |> should equal html

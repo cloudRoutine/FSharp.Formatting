@@ -8,8 +8,6 @@ NUGET
     FSharp.Core (4.0.0.1)
     FSharp.Data (2.3.2)
       Zlib.Portable (>= 1.11) - framework: >= netstandard11, portable-net45+sl5+win8, portable-net45+win8, portable-net45+win8+wp8+wpa81
-    FSharpVSPowerTools.Core (2.4)
-      FSharp.Compiler.Service (>= 2.0.0.8)
     ILRepack (2.0.12)
     Microsoft.AspNet.Razor (4.0.0-rc1-final)
       System.Diagnostics.Tools (>= 4.0.1-beta-23516) - framework: dnxcore50
@@ -522,6 +520,9 @@ NUGET
       System.Threading (>= 4.3) - framework: dnxcore50, >= netstandard13
       System.Xml.ReaderWriter (>= 4.3) - framework: dnxcore50, netstandard10, >= netstandard13
     Zlib.Portable (1.11) - framework: >= netstandard11, portable-net45+sl5+win8, portable-net45+win8, portable-net45+win8+wp8+wpa81
+  remote: https://ci.appveyor.com/nuget/fsharp-editing-vfpt
+    FSharp.Editing.Core (2.5.5)
+      FSharp.Compiler.Service (>= 8.0)
 GITHUB
   remote: matthid/Yaaf.FSharp.Scripting
     src/source/Yaaf.FSharp.Scripting/YaafFSharpScripting.fs (40ef4e32a115962436809666b6868693be6444c2)

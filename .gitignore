@@ -14,7 +14,9 @@ packages/FSharp.Formatting/lib
 TestResults.xml
 TestResult.xml
 temp/
-tests/Benchmarks/testfiles/*/*.html
+/tests/Benchmarks/
+/tests/Benchmarks/*.*
+/tests/Benchmarks/benchmark/*.*
 misc/literate/output/content/
 *.sln.DotSettings.user
 *.userprefs
