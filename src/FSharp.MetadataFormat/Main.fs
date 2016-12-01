@@ -760,8 +760,22 @@ module Reader =
     else "M"
 
   let getXmlDocSigForMember (memb:FSharpMemberOrFunctionOrValue) =
+    // TODO - fix this, or do something sensible
+    //  threw in some nearly random code to avoid build breaking errors
     let memberName =
       try
+        if memb.IsActivePattern then
+            sprintf "(|%s|)" memb.DisplayName
+        elif memb.IsTypeFunction then
+            let paramls = 
+                memb.CurriedParameterGroups
+                |> Seq.collect (fun (x:FSharpParameter IList) ->  
+                    x |> Seq.map (fun y -> sprintf " (%s:%O)" y.DisplayName y.Type ))
+                 |> String.Concat
+            sprintf "%s%s" memb.FullName paramls
+        elif memb.IsModuleValueOrMember then
+            memb.FullName
+        else
         let name = memb.CompiledName.Replace(".ctor", "#ctor")
         let typeGenericParameters =
             memb.EnclosingEntity.GenericParameters |> Seq.mapi (fun num par -> par.Name, sprintf "`%d" num)
@@ -797,8 +811,21 @@ module Reader =
             else ""
         sprintf "%s%s%s" name typeargs paramList
       with exn ->
-        Log.errorf "Error while building member-name for %s because: %s" memb.FullName exn.Message
-        Log.verbf "Full Exception details of previous message: %O" exn
+        Log.errorf "Error while building member-name for -\n\
+                    - DisplayName : %s\n\
+                    - FullName    : %s\n\
+                    - LogicalName : %s\n\
+                    - Location    : %A\n\
+                    - Assembly    : %s\n\
+                    \n\
+                    - Because     : %s\n\
+                    @ %O\n\
+                    %O\n"
+                        memb.DisplayName memb.FullName  memb.LogicalName 
+                        memb.DeclarationLocation memb.Assembly.QualifiedName 
+                        exn.Message exn.TargetSite exn.StackTrace
+
+        Log.verbf "Full Exception details of previous message:\n%O" exn
         memb.CompiledName
     match (memb.XmlDocSig, memb.EnclosingEntity.TryFullName) with
     | "",  None    -> ""

@@ -47,7 +47,7 @@ open FSharp.Formatting.Razor
 #if RELEASE
 let root = website
 #else
-let root = "file://" + (__SOURCE_DIRECTORY__ @@ "../output")
+let root = "file://" + (__SOURCE_DIRECTORY__ </> "../output")
 #endif
 
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
@@ -59,52 +59,56 @@ let output     = "../output"
 let files      = "../files"
 let templates  = "."
 let formatting = "../../misc/"
-let docTemplate = formatting @@ "templates/docpage.cshtml"
-let docTemplateSbS = templates @@ "docpage-sidebyside.cshtml"
+let docTemplate = formatting </> "templates/docpage.cshtml"
+let docTemplateSbS = templates </> "docpage-sidebyside.cshtml"
 
 // Where to look for *.csproj templates (in this order)
 let layoutRootsAll = new System.Collections.Generic.Dictionary<string, string list>()
-layoutRootsAll.Add("en",[ templates; formatting @@ "templates"
-                          formatting @@ "templates/reference" ])
+layoutRootsAll.Add("en",[ templates; formatting </> "templates"
+                          formatting </> "templates/reference" ])
 subDirectories (directoryInfo templates)
 |> Seq.iter (fun d ->
                 let name = d.Name
                 if name.Length = 2 || name.Length = 3 then
                     layoutRootsAll.Add(
-                            name, [templates @@ name
-                                   formatting @@ "templates"
-                                   formatting @@ "templates/reference" ]))
+                            name, [templates </> name
+                                   formatting </> "templates"
+                                   formatting </> "templates/reference" ]))
 
 let fsiEvaluator = lazy (Some (FsiEvaluator() :> IFsiEvaluator))
 
 // Copy static files and CSS + JS from F# Formatting
 let copyFiles () =
   CopyRecursive files output true |> Log "Copying file: "
-  ensureDirectory (output @@ "content")
-  //CopyRecursive (formatting @@ "styles") (output @@ "content") true
+  ensureDirectory (output </> "content")
+  //CopyRecursive (formatting </> "styles") (output </> "content") true
   //  |> Log "Copying styles and scripts: "
 
 let binaries =
     referenceBinaries
     |> List.ofSeq
-    |> List.map (fun b -> bin @@ b)
+    |> List.map (fun b -> bin </> b)
 
 let libDirs = [bin]
 
 // Build API reference from XML comments
 let buildReference () =
-  CleanDir (output @@ "reference")
+  CleanDir (output </> "reference")
   RazorMetadataFormat.Generate
-    ( binaries, output @@ "reference", layoutRootsAll.["en"],
-      parameters = ("root", root)::info,
-      sourceRepo = githubLink @@ "tree/master",
-      sourceFolder = __SOURCE_DIRECTORY__ @@ ".." @@ "..",
-      publicOnly = true, libDirs = libDirs)
+    (   binaries
+    ,   output </> "reference"
+    ,   layoutRootsAll.["en"]
+    ,   parameters     = ("root", root)::info
+    ,   sourceRepo     = (githubLink </> "tree/master")
+    ,   sourceFolder   = (__SOURCE_DIRECTORY__ </> ".." </> "..")
+    ,   publicOnly     = true
+    ,   libDirs        = libDirs
+    )
 
 // Build documentation from `fsx` and `md` files in `docs/content`
 let buildDocumentation () =
   let subdirs =
-    [ content @@ "sidebyside", docTemplateSbS
+    [ content </> "sidebyside", docTemplateSbS
       content, docTemplate; ]
   for dir, template in subdirs do
     let sub = "." // Everything goes into the same output directory here
@@ -117,7 +121,7 @@ let buildDocumentation () =
         | Some lang -> layoutRootsAll.[lang]
         | None -> layoutRootsAll.["en"] // "en" is the default language
     RazorLiterate.ProcessDirectory
-      ( dir, template, output @@ sub, replacements = ("root", root)::info,
+      ( dir, template, output </> sub, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
         generateAnchors = true,
         processRecursive = false,

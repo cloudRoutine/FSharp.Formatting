@@ -214,7 +214,7 @@ let RequireRange breakingPoint version =
 
 Target "CopyFSharpCore" (fun _ ->
     // We need to include optdata and sigdata as well, we copy everything to be consistent
-    for file in System.IO.Directory.EnumerateFiles("packages" </> "FSharp.Core" </> "lib" </> framework) do
+    for file in System.IO.Directory.EnumerateFiles("packages" </> "FSharp.Core" </> "lib" </>"net40") do
         let source, dest = file, Path.Combine("bin", Path.GetFileName(file))
         printfn "Copying %s to %s" source dest
         File.Copy(source, dest, true))
@@ -270,7 +270,11 @@ let fakeStartInfo script workingDirectory args fsiargs environmentVars =
             setVar k v
         setVar "MSBuild" msBuildExe
         setVar "GIT" Git.CommandHelper.gitPath
-        setVar "FSI" fsiPath)
+
+        match tryFindFileOnPath "fsi.exe" with
+        | Some fsiexe -> setVar "FSI" fsiexe
+        | None        -> setVar "FSI" fsiPath
+        )
 
 let commandToolPath = "bin"</>"fsformatting.exe"
 let commandToolStartInfo workingDirectory environmentVars args =
@@ -284,7 +288,11 @@ let commandToolStartInfo workingDirectory environmentVars args =
             setVar k v
         setVar "MSBuild" msBuildExe
         setVar "GIT" Git.CommandHelper.gitPath
-        setVar "FSI" fsiPath)
+
+        match tryFindFileOnPath "fsi.exe" with
+        | Some fsiexe -> setVar "FSI" fsiexe
+        | None        -> setVar "FSI" fsiPath
+        )
 
 /// Run the given buildscript with FAKE.exe
 let executeWithOutput configStartInfo =
@@ -371,11 +379,19 @@ let bootStrapDocumentationFiles () =
     // If you add files here to make the CI happy add those files to the .nuspec file as well
     // TODO: INSTEAD build the nuspec file before generating the documentation and extract it...
     ensureDirectory (__SOURCE_DIRECTORY__ </> "packages/FSharp.Formatting/lib"</>framework)
-    let buildFiles = [ "CSharpFormat.dll"; "FSharp.CodeFormat.dll"; "FSharp.Literate.dll"
-                       "FSharp.Markdown.dll"; "FSharp.MetadataFormat.dll"; "RazorEngine.dll";
-//                       "System.Web.Razor.dll"; 
-                       "Microsoft.AspNet.Razor.dll";
-                       "FSharp.Formatting.Common.dll"; "FSharp.Formatting.Razor.dll" ]
+    let buildFiles = [ 
+        "CSharpFormat.dll" 
+        "FSharp.CodeFormat.dll"
+        "FSharp.Literate.dll"
+        "FSharp.Markdown.dll"
+        "FSharp.Formatting.Common.dll"
+        "FSharp.MetadataFormat.dll"
+        "RazorEngine.dll"
+        "Microsoft.AspNet.Razor.dll"
+        "Microsoft.AspNetCore.Razor.dll"
+        "FSharp.Editing.dll"
+        "FSharp.Formatting.Razor.dll" 
+    ]
     let bundledFiles =
         buildFiles
         |> List.map (fun f ->
@@ -390,10 +406,15 @@ let bootStrapDocumentationFiles () =
 
 Target "DogFoodCommandTool" (fun _ ->
     // generate metadata reference
-    let dllFiles =
-      [ "FSharp.CodeFormat.dll"; "FSharp.Formatting.Common.dll"
-        "FSharp.Literate.dll"; "FSharp.Markdown.dll"; "FSharp.MetadataFormat.dll"; "FSharp.Formatting.Razor.dll" ]
-        |> List.map (sprintf "bin/%s")
+    let dllFiles = 
+        [   "FSharp.CodeFormat.dll"
+            "FSharp.Formatting.Common.dll"
+            "FSharp.Literate.dll"
+            "FSharp.Markdown.dll"
+            "FSharp.MetadataFormat.dll"
+            "FSharp.Formatting.Razor.dll" 
+         ]   |> List.map (sprintf "bin/%s")
+        
     let layoutRoots =
       [ "docs/tools"; "misc/templates"; "misc/templates/reference" ]
     let libDirs = [ "bin/" ]

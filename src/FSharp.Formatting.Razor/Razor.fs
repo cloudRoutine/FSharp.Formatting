@@ -210,6 +210,10 @@ type RazorRender(layoutRoots, namespaces, template:string, ?references : string 
       if template.EndsWith(".cshtml") then
           template.Substring(0, template.Length - 7)
       else template
+  do
+    printfn "layout roots - %s"  (String.concat " " layoutRoots)
+    printfn "namespaces   - %s"  (String.concat " " namespaces)
+    printfn "template     - %s"  template
 
   let razorEngine = RazorEngineCache.Get layoutRoots namespaces references
   let handleCompile source f =
