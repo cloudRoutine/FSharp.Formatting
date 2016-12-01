@@ -71,7 +71,7 @@ subDirectories (directoryInfo templates)
                 let name = d.Name
                 if name.Length = 2 || name.Length = 3 then
                     layoutRootsAll.Add(
-                            name, [templates </> name
+                            name, [templates  </> name
                                    formatting </> "templates"
                                    formatting </> "templates/reference" ]))
 

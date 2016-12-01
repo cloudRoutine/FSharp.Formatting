@@ -9,7 +9,6 @@ nuget FSharp.Data
 
 nuget CommandLineParser
 nuget FSharp.Core
-nuget Microsoft.AspNet.Razor 4.0.0-rc1-final prerelease
 nuget RazorEngine 4.4.3-rc1 prerelease
 nuget NUnit 
 nuget NUnit.Runners

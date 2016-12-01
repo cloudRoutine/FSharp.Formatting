@@ -26,12 +26,12 @@
     <file src="..\bin\FSharp.Markdown.*" target="lib/net46" />
     <file src="..\bin\FSharp.Formatting.Common.*" target="lib/net46" />
     <file src="..\bin\FSharp.MetadataFormat.*" target="lib/net46" />
-    <file src="..\bin\RazorEngine.*" target="lib/net46" />
+    <!--<file src="..\bin\RazorEngine.*" target="lib/net46" />-->
     <!--<file src="..\bin\System.Web.Razor.*" target="lib/net46" />-->
-    <file src="..\bin\Microsoft.AspNet.Razor.*" target="lib/net46" />
-    <file src="..\bin\Microsoft.AspNetCore.Razor.*" target="lib/net46" />
+    <!--<file src="..\bin\Microsoft.AspNet.Razor.*" target="lib/net46" />
+    <file src="..\bin\Microsoft.AspNetCore.Razor.*" target="lib/net46" />-->
     <file src="..\bin\FSharp.Editing.*" target="lib/net46" />
-    <file src="..\bin\FSharp.Formatting.Razor.*" target="lib/net46" />
+    <!--<file src="..\bin\FSharp.Formatting.Razor.*" target="lib/net46" />-->
     <!-- Loader script -->
     <file src="..\packages\FSharp.Formatting\FSharp.Formatting.fsx" target="FSharp.Formatting.fsx" />
     <!-- Templates & styles & literate demos -->

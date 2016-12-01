@@ -48,6 +48,7 @@ let framework = "net46"
 
 let (^) = (<|)
 
+
 // --------------------------------------------------------------------------------------
 // Generate assembly info files with the right version & up-to-date information
 
@@ -258,22 +259,23 @@ Target "NuGet" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
+setEnvironVar  "MSBuild" msBuildExe
+setEnvironVar  "GIT"     Git.CommandHelper.gitPath
+setEnvironVar  "FSI"     fsiPath
+
 let fakePath = "packages"</>"build"</>"FAKE"</>"tools"</>"FAKE.exe"
 let fakeStartInfo script workingDirectory args fsiargs environmentVars =
     (fun (info: System.Diagnostics.ProcessStartInfo) ->
         info.FileName <- System.IO.Path.GetFullPath fakePath
         info.Arguments <- sprintf "%s --fsiargs -d:FAKE %s \"%s\"" args fsiargs script
         info.WorkingDirectory <- workingDirectory
-        let setVar k v =
-            info.EnvironmentVariables.[k] <- v
-        for (k, v) in environmentVars do
-            setVar k v
-        setVar "MSBuild" msBuildExe
-        setVar "GIT" Git.CommandHelper.gitPath
-
-        match tryFindFileOnPath "fsi.exe" with
-        | Some fsiexe -> setVar "FSI" fsiexe
-        | None        -> setVar "FSI" fsiPath
+//        let setVar k v =
+//            info.EnvironmentVariables.[k] <- v
+//        for (k, v) in environmentVars do
+//            setVar k v
+//        setVar "MSBuild" msBuildExe
+//        setVar "GIT" Git.CommandHelper.gitPath
+//        setVar "FSI" fsiPath
         )
 
 let commandToolPath = "bin"</>"fsformatting.exe"
@@ -282,16 +284,13 @@ let commandToolStartInfo workingDirectory environmentVars args =
         info.FileName <- System.IO.Path.GetFullPath commandToolPath
         info.Arguments <- args
         info.WorkingDirectory <- workingDirectory
-        let setVar k v =
-            info.EnvironmentVariables.[k] <- v
-        for (k, v) in environmentVars do
-            setVar k v
-        setVar "MSBuild" msBuildExe
-        setVar "GIT" Git.CommandHelper.gitPath
-
-        match tryFindFileOnPath "fsi.exe" with
-        | Some fsiexe -> setVar "FSI" fsiexe
-        | None        -> setVar "FSI" fsiPath
+//        let setVar k v =
+//            info.EnvironmentVariables.[k] <- v
+//        for (k, v) in environmentVars do
+//            setVar k v
+//        setVar "MSBuild" msBuildExe
+//        setVar "GIT" Git.CommandHelper.gitPath
+//        setVar "FSI" fsiPath
         )
 
 /// Run the given buildscript with FAKE.exe
@@ -379,19 +378,19 @@ let bootStrapDocumentationFiles () =
     // If you add files here to make the CI happy add those files to the .nuspec file as well
     // TODO: INSTEAD build the nuspec file before generating the documentation and extract it...
     ensureDirectory (__SOURCE_DIRECTORY__ </> "packages/FSharp.Formatting/lib"</>framework)
-    let buildFiles = [ 
-        "CSharpFormat.dll" 
-        "FSharp.CodeFormat.dll"
-        "FSharp.Literate.dll"
-        "FSharp.Markdown.dll"
-        "FSharp.Formatting.Common.dll"
-        "FSharp.MetadataFormat.dll"
-        "RazorEngine.dll"
-        "Microsoft.AspNet.Razor.dll"
-        "Microsoft.AspNetCore.Razor.dll"
-        "FSharp.Editing.dll"
-        "FSharp.Formatting.Razor.dll" 
-    ]
+    let buildFiles = 
+        [   "CSharpFormat.dll" 
+            "FSharp.CodeFormat.dll"
+            "FSharp.Literate.dll"
+            "FSharp.Markdown.dll"
+            "FSharp.Formatting.Common.dll"
+            "FSharp.MetadataFormat.dll"
+    //        "RazorEngine.dll"
+    //        "Microsoft.AspNet.Razor.dll"
+    //        "Microsoft.AspNetCore.Razor.dll"
+            "FSharp.Editing.dll"
+    //        "FSharp.Formatting.Razor.dll" 
+        ]
     let bundledFiles =
         buildFiles
         |> List.map (fun f ->
@@ -412,7 +411,7 @@ Target "DogFoodCommandTool" (fun _ ->
             "FSharp.Literate.dll"
             "FSharp.Markdown.dll"
             "FSharp.MetadataFormat.dll"
-            "FSharp.Formatting.Razor.dll" 
+//            "FSharp.Formatting.Razor.dll" 
          ]   |> List.map (sprintf "bin/%s")
         
     let layoutRoots =
