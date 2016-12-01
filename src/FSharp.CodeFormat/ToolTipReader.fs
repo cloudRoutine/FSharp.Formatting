@@ -58,8 +58,8 @@ let private formatElement = function
             yield Literal "   "
             yield Emphasis [Literal (msg) ]
             yield HardLineBreak ]
-
-  | FSharpToolTipElement.CompositionError(err) -> []
+  | FSharpToolTipElement.SingleParameter (_,_,_) -> []
+  | FSharpToolTipElement.CompositionError _err -> []
 
 /// Format entire tool tip as a value of type ToolTipSpans      
 let private formatTip tip = 

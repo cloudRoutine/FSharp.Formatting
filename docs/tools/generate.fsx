@@ -28,7 +28,7 @@ let referenceBinaries =
 // --------------------------------------------------------------------------------------
 
 
-#I "../../packages/FAKE/tools/"
+#I "../../packages/build/FAKE/tools/"
 #r "NuGet.Core.dll"
 #r "FakeLib.dll"
 open Fake

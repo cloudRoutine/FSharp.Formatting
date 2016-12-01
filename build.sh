@@ -14,7 +14,7 @@ then
     exit $exit_code
   fi
 
-  packages/FAKE/tools/FAKE.exe build.fsx $@
+  packages/build/FAKE/tools/FAKE.exe build.fsx $@
 else
   # use mono
 
@@ -30,5 +30,5 @@ else
     exit $exit_code
   fi
   
-  mono packages/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO build.fsx
+  mono packages/build/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO build.fsx
 fi

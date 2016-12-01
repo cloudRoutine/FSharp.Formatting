@@ -109,27 +109,27 @@ Target "Build" (fun _ ->
 
 Target "MergeVSPowerTools" (fun _ ->
     () (*
-    let binDir = __SOURCE_DIRECTORY__ @@ "bin"
-    CreateDir (binDir @@ "merged")
+    let binDir = __SOURCE_DIRECTORY__ </> "bin"
+    CreateDir (binDir </> "merged")
 
     let toPack =
-        (binDir @@ "FSharp.CodeFormat.dll") + " " +
-        (binDir @@ "FSharpVSPowerTools.Core.dll")
+        (binDir </> "FSharp.CodeFormat.dll") + " " +
+        (binDir </> "FSharpVSPowerTools.Core.dll")
 
     let result =
         ExecProcess (fun info ->
-            info.FileName <- currentDirectory @@ "packages/ILRepack/tools/ILRepack.exe"
+            info.FileName <- currentDirectory </> "packages/ILRepack/tools/ILRepack.exe"
             info.Arguments <-
               sprintf
                 "/internalize /verbose /lib:bin /ver:%s /out:%s %s"
-                release.AssemblyVersion (binDir @@ "merged" @@ "FSharp.CodeFormat.dll") toPack
+                release.AssemblyVersion (binDir </> "merged" </> "FSharp.CodeFormat.dll") toPack
             ) (TimeSpan.FromMinutes 5.)
 
     if result <> 0 then failwithf "Error during ILRepack execution."
 
-    !! (binDir @@ "merged" @@ "*.*")
+    !! (binDir </> "merged" </> "*.*")
     |> CopyFiles binDir
-    DeleteDir (binDir @@ "merged")
+    DeleteDir (binDir </> "merged")
     *)
 )
 // --------------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ let RequireRange breakingPoint version =
 
 Target "CopyFSharpCore" (fun _ ->
     // We need to include optdata and sigdata as well, we copy everything to be consistent
-    for file in System.IO.Directory.EnumerateFiles("packages" @@ "FSharp.Core" @@ "lib" @@ "net40") do
+    for file in System.IO.Directory.EnumerateFiles("packages" </> "FSharp.Core" </> "lib" </> "net40") do
         let source, dest = file, Path.Combine("bin", Path.GetFileName(file))
         printfn "Copying %s to %s" source dest
         File.Copy(source, dest, true))
@@ -255,7 +255,7 @@ Target "NuGet" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
-let fakePath = "packages" @@ "FAKE" @@ "tools" @@ "FAKE.exe"
+let fakePath = "packages"</>"build"</>"FAKE"</>"tools"</>"FAKE.exe"
 let fakeStartInfo script workingDirectory args fsiargs environmentVars =
     (fun (info: System.Diagnostics.ProcessStartInfo) ->
         info.FileName <- System.IO.Path.GetFullPath fakePath
@@ -269,7 +269,7 @@ let fakeStartInfo script workingDirectory args fsiargs environmentVars =
         setVar "GIT" Git.CommandHelper.gitPath
         setVar "FSI" fsiPath)
 
-let commandToolPath = "bin" @@ "fsformatting.exe"
+let commandToolPath = "bin"</>"fsformatting.exe"
 let commandToolStartInfo workingDirectory environmentVars args =
     (fun (info: System.Diagnostics.ProcessStartInfo) ->
         info.FileName <- System.IO.Path.GetFullPath commandToolPath
@@ -367,15 +367,15 @@ let bootStrapDocumentationFiles () =
     // If you came here from the nuspec file add your file.
     // If you add files here to make the CI happy add those files to the .nuspec file as well
     // TODO: INSTEAD build the nuspec file before generating the documentation and extract it...
-    ensureDirectory (__SOURCE_DIRECTORY__ @@ "packages/FSharp.Formatting/lib/net40")
+    ensureDirectory (__SOURCE_DIRECTORY__ </> "packages/FSharp.Formatting/lib/net40")
     let buildFiles = [ "CSharpFormat.dll"; "FSharp.CodeFormat.dll"; "FSharp.Literate.dll"
                        "FSharp.Markdown.dll"; "FSharp.MetadataFormat.dll"; "RazorEngine.dll";
                        "System.Web.Razor.dll"; "FSharp.Formatting.Common.dll"; "FSharp.Formatting.Razor.dll" ]
     let bundledFiles =
         buildFiles
         |> List.map (fun f ->
-            __SOURCE_DIRECTORY__ @@ sprintf "bin/%s" f,
-            __SOURCE_DIRECTORY__ @@ sprintf "packages/FSharp.Formatting/lib/net40/%s" f)
+            __SOURCE_DIRECTORY__ </> sprintf "bin/%s" f,
+            __SOURCE_DIRECTORY__ </> sprintf "packages/FSharp.Formatting/lib/net40/%s" f)
         |> List.map (fun (source, dest) -> Path.GetFullPath source, Path.GetFullPath dest)
     for source, dest in bundledFiles do
         try
@@ -462,15 +462,15 @@ Target "All" DoNothing
 Target "DownloadPython" (fun _ ->
   if not isUnix then
     let w = new System.Net.WebClient()
-    let zipFile = "temp"@@"cpython.zip"
+    let zipFile = "temp"</>"cpython.zip"
     if File.Exists zipFile then File.Delete zipFile
     w.DownloadFile("https://www.python.org/ftp/python/3.5.1/python-3.5.1-embed-amd64.zip", zipFile)
-    let cpython = "temp"@@"CPython"
+    let cpython = "temp"</>"CPython"
     CleanDir cpython
     System.IO.Compression.ZipFile.ExtractToDirectory(zipFile, cpython)
-    let cpythonStdLib = cpython@@"stdlib"
+    let cpythonStdLib = cpython</>"stdlib"
     CleanDir cpythonStdLib
-    System.IO.Compression.ZipFile.ExtractToDirectory(cpython@@"python35.zip", cpythonStdLib)
+    System.IO.Compression.ZipFile.ExtractToDirectory(cpython</>"python35.zip", cpythonStdLib)
 )
 
 Target "CreateTestJson" (fun _ ->
@@ -480,11 +480,11 @@ Target "CreateTestJson" (fun _ ->
 
     let pythonExe, stdLib =
       if not isUnix then
-        System.IO.Path.GetFullPath ("temp"@@"CPython"@@"python.exe"),
-        System.IO.Path.GetFullPath ("temp"@@"CPython"@@"stdlib")
+        System.IO.Path.GetFullPath ("temp"</>"CPython"</>"python.exe"),
+        System.IO.Path.GetFullPath ("temp"</>"CPython"</>"stdlib")
       else "python", ""
 
-    let resultFile = "temp"@@"commonmark-tests.json"
+    let resultFile = "temp"</>"commonmark-tests.json"
     if File.Exists resultFile then File.Delete resultFile
     ( use fileStream = new StreamWriter(File.Open(resultFile, System.IO.FileMode.Create))
       executeHelper
@@ -502,17 +502,37 @@ Target "CreateTestJson" (fun _ ->
             setVar "MSBuild" msBuildExe
             setVar "GIT" Git.CommandHelper.gitPath
             setVar "FSI" fsiPath))
-    File.Copy(resultFile, "tests"@@"commonmark_spec.json")
+    File.Copy(resultFile, "tests"</>"commonmark_spec.json")
 )
 
-"Clean" ==> "AssemblyInfo" ==> "Build" ==> "BuildTests"
-"Build" ==> "MergeVSPowerTools" ==> "All"
-"BuildTests" ==> "RunTests" ==> "All"
-"GenerateDocs" ==> "All"
-"Build" ==> "CopyFSharpCore" ==> "DogFoodCommandTool" ==> "All"
-"UpdateFsxVersions" ==> "All"
+"Clean" 
+  ==> "AssemblyInfo" 
+  ==> "Build" 
+  ==> "BuildTests"
 
-"CopyFSharpCore" ==> "NuGet"
+"Build" 
+  ==> "MergeVSPowerTools" 
+  ==> "All"
+
+"BuildTests" 
+  ==> "RunTests" 
+  ==> "All"
+
+"GenerateDocs" 
+  ==> "All"
+
+"Build" 
+  ==> "CopyFSharpCore" 
+  ==> "DogFoodCommandTool" 
+  ==> "All"
+
+"UpdateFsxVersions" 
+  ==> "All"
+
+"CopyFSharpCore" 
+  ==> "NuGet"
+
+
 "All"
   ==> "NuGet"
   ==> "ReleaseDocs"
@@ -520,6 +540,7 @@ Target "CreateTestJson" (fun _ ->
   ==> "CreateTag"
   ==> "Release"
 
-"DownloadPython" ==> "CreateTestJson"
+"DownloadPython" 
+  ==> "CreateTestJson"
 
 RunTargetOrDefault "All"

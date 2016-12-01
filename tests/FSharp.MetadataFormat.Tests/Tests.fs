@@ -60,8 +60,7 @@ let ``MetadataFormat works on sample Deedle assembly``() =
   System.Diagnostics.Process.Start(output)
   #endif
 
-// Ignore by default to make tests run reasonably fast
-[<Test; Ignore>]
+[<Test; Ignore "Ignore by default to make tests run reasonably fast">]
 let ``MetadataFormat works on sample FAKE assembly``() =
   let library = root @@ "files" @@ "FAKE" @@ "FakeLib.dll"
   let output = getOutputDir()
@@ -271,7 +270,7 @@ let ``MetadataFormat test that csharp (publiconly) support works``() =
   #endif
 
 
-[<Ignore>] // Ignored because publicOnly=false is currently not working, see https://github.com/tpetricek/FSharp.Formatting/pull/259
+[<Ignore "Ignored because publicOnly=false is currently not working, see https://github.com/tpetricek/FSharp.Formatting/pull/259">] 
 [<Test>]
 let ``MetadataFormat test that csharp support works``() =
   let libraries =

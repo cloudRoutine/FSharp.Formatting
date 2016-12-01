@@ -255,7 +255,7 @@ type CodeFormatAgent() =
   /// first call, so this function creates workflow that tries repeatedly
   let getTypeCheckInfo(file, source, opts) = async {
       let! checkResults = languageService.ParseAndCheckFileInProject(opts, file, source, AllowStaleResults.No)
-      let! symbolUses = languageService.GetAllUsesOfAllSymbolsInFile (opts, file, source, AllowStaleResults.No, false, new Profiler())
+      let! symbolUses = languageService.GetAllUsesOfAllSymbolsInFile (opts, file, source, AllowStaleResults.No, false)
       return checkResults, symbolUses
   }
    
@@ -296,13 +296,13 @@ type CodeFormatAgent() =
             member __.LineCount = sourceLines.Length } 
 
     let categorizedSpans = 
-        SourceCodeClassifier.getCategoriesAndLocations(
-            symbolUses, checkResults, lexer, (fun line -> sourceLines.[line]), [], None)
+        SourceCodeClassifier.getCategorizedSpans(
+            symbolUses, checkResults, lexer, (fun line -> sourceLines.[line]))
         |> Seq.groupBy (fun span -> span.WordSpan.Line)
         |> Map.ofSeq
 
     /// Parse source file into a list of lines consisting of tokens 
-    let tokens = Helpers.getTokens file defines sourceLines
+    let tokens = Helpers.getTokens (Some file) defines sourceLines
 
     // --------------------------------------------------------------------------------
     // When type-checking completes and we have a parsed file (as tokens), we can

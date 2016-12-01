@@ -9,15 +9,16 @@ nuget CommandLineParser
 nuget FSharp.Core
 nuget Microsoft.AspNet.Razor 4.0.0-rc1-final prerelease
 nuget RazorEngine 4.4.3-rc1 prerelease
-
+nuget NUnit 
+nuget NUnit.Runners
 nuget NuGet.CommandLine
-nuget FSharp.Compiler.Service == 2.0.0.6
+nuget FSharp.Compiler.Service
 // See http://fsprojects.github.io/Paket/nuget-dependencies.html
 // This basically means we need the lowest version for its dependencies (FSharp.Compiler.Service)
 // Otherwise we get runtime errors without binding redirects
 // (which we cannot control running as part of a build script).
 // See https://github.com/tpetricek/FSharp.Formatting/issues/277 as well.
-nuget FSharpVSPowerTools.Core !>= 0
+nuget FSharpVSPowerTools.Core
 nuget ILRepack
 
 group build 
@@ -25,8 +26,5 @@ group build
     
     nuget FAKE
 
-group test
-    source http://nuget.org/api/v2
 
-    nuget NUnit 
-    nuget NUnit.Runners
+

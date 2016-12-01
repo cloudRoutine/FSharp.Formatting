@@ -1,6 +1,6 @@
 @echo off
 
-.paket\paket.bootstrapper.exe
+.paket\paket.bootstrapper.exe --max-file-age=120
 if errorlevel 1 (
   exit /b %errorlevel%
 )
@@ -10,5 +10,5 @@ if errorlevel 1 (
   exit /b %errorlevel%
 )
 
-packages\FAKE\tools\FAKE.exe build.fsx %*
+packages\build\FAKE\tools\FAKE.exe build.fsx %*
 pause
